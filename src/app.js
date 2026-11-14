@@ -7,7 +7,7 @@ const STARTED_AT = new Date().toISOString();
 
 // Dữ liệu mẫu cho trang nội bộ — sau này có thể thay bằng database
 const announcements = [
-  { id: 1, title: 'Chào mừng đến cổng thông tin nội bộ', date: '2026-11-14' },
+  { id: 1, title: 'Chào mừng đến cổng thông tin nội bộ design by loinguyen2', date: '2026-11-14' },
   { id: 2, title: 'Mỗi lần push lên main, website sẽ tự động deploy lại', date: '2026-11-14' },
 ];
 
