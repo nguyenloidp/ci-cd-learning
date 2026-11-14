@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cổng thông tin nội bộ</title>
+  <style>
+    :root { --bg:#f6f7f9; --card:#fff; --text:#1d2330; --muted:#6b7280; --accent:#a50064; --border:#e5e7eb; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#111318; --card:#1b1e25; --text:#e8eaed; --muted:#9aa0a6; --accent:#ff5fb0; --border:#2c303a; }
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--text); }
+    header { padding:24px 16px; border-bottom:1px solid var(--border); background:var(--card); }
+    header h1 { margin:0; font-size:1.5rem; color:var(--accent); }
+    header p { margin:4px 0 0; color:var(--muted); font-size:.9rem; }
+    main { max-width:900px; margin:24px auto; padding:0 16px; display:grid; gap:16px; grid-template-columns: 2fr 1fr; }
+    @media (max-width: 700px) { main { grid-template-columns: 1fr; } }
+    section { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; }
+    h2 { margin-top:0; font-size:1.1rem; }
+    ul { padding-left:18px; margin:0; }
+    li { margin:8px 0; }
+    .date { color:var(--muted); font-size:.85rem; }
+    a { color:var(--accent); }
+    code { background:var(--bg); padding:2px 6px; border-radius:4px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cổng thông tin nội bộ</h1>
+    <p>Phiên bản: <code id="version">…</code> · Khởi động lúc: <span id="started">…</span></p>
+  </header>
+  <main>
+    <section>
+      <h2>Thông báo</h2>
+      <ul id="announcements"></ul>
+    </section>
+    <section>
+      <h2>Liên kết nhanh</h2>
+      <ul id="links"></ul>
+    </section>
+  </main>
+  <script>
+    const get = (url) => fetch(url).then((r) => r.json());
+    get('/api/info').then((i) => {
+      document.getElementById('version').textContent = i.version;
+      document.getElementById('started').textContent = new Date(i.startedAt).toLocaleString('vi-VN');
+    });
+    get('/api/announcements').then((items) => {
+      document.getElementById('announcements').innerHTML = items
+        .map((a) => `<li>${a.title} <div class="date">${a.date}</div></li>`).join('');
+    });
+    get('/api/links').then((items) => {
+      document.getElementById('links').innerHTML = items
+        .map((l) => `<li><a href="${l.url}" target="_blank" rel="noopener">${l.name}</a></li>`).join('');
+    });
+  </script>
+</body>
+</html>

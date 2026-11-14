@@ -1,0 +1,50 @@
+# CI = Continuous Integration
+# Chạy mỗi khi tạo Pull Request hoặc push lên bất kỳ nhánh nào:
+# kiểm tra code có chạy được, test có qua, Docker image có build được không.
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lấy code về
+        uses: actions/checkout@v4
+
+      - name: Cài Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Cài dependency
+        run: npm ci
+
+      - name: Chạy test
+        run: npm test
+
+  docker-build:
+    needs: test # chỉ build khi test đã qua
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image (không push)
+        run: docker build -t ci-cd-learning:test .
+
+      - name: Chạy thử container và gọi /health
+        run: |
+          docker run -d --name smoke -p 3000:3000 ci-cd-learning:test
+          for i in $(seq 1 10); do
+            curl -fs http://localhost:3000/health && exit 0
+            sleep 1
+          done
+          docker logs smoke
+          exit 1
